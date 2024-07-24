@@ -1,0 +1,49 @@
+//configuration
+var app = angular.module('myApp', []);
+
+app.service('AuthService', function($http) {
+    this.login = function(credentials) {
+        return $http.post('/login', credentials);
+    };
+
+    this.setToken = function(token) {
+        localStorage.setItem('jwtToken', token);
+    };
+
+    this.getToken = function() {
+        return localStorage.getItem('jwtToken');
+    };
+});
+
+
+app.factory('AuthInterceptor', function($q, AuthService) {
+    return {
+        request: function(config) {
+            var token = AuthService.getToken();
+            if (token) {
+                config.headers['Authorization'] = 'Bearer ' + token;
+            }
+            return config;
+        },
+        responseError: function(response) {
+            if (response.status === 401 || response.status === 403) {
+                // handle the case where the user is not authenticated
+            }
+            return $q.reject(response);
+        }
+    };
+});
+
+app.config(function($httpProvider) {
+    $httpProvider.interceptors.push('AuthInterceptor');
+});
+
+
+
+app.controller('LoginController', function($scope, AuthService) {
+    $scope.login = function() {
+        AuthService.login($scope.credentials).then(function(response) {
+            AuthService.setToken(response.data);
+        });
+    };
+});
