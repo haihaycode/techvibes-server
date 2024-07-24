@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseWrapper<Void>> handleUsernameAlreadyExists(UserAlreadyExistsException ex) {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.CONFLICT, ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
+    }   
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ResponseWrapper<Void>> handleRoleNotFound(RoleNotFoundException ex) {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.NOT_FOUND, ex.getMessage(), null);

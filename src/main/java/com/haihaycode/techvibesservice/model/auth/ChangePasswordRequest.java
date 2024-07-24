@@ -7,7 +7,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@Builder
 public class ChangePasswordRequest {
     @NotBlank(message = "Current password is required.")
     private String currentPassword;

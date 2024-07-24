@@ -5,15 +5,15 @@ import com.haihaycode.techvibesservice.entity.UserEntity;
 import com.haihaycode.techvibesservice.exception.InvalidInputException;
 import com.haihaycode.techvibesservice.exception.RoleNotFoundException;
 import com.haihaycode.techvibesservice.exception.UserAlreadyExistsException;
-import com.haihaycode.techvibesservice.model.auth.ChangePasswordRequest;
-import com.haihaycode.techvibesservice.model.auth.InfoResponse;
-import com.haihaycode.techvibesservice.model.auth.LoginResponse;
-import com.haihaycode.techvibesservice.model.auth.RegisterRequest;
+import com.haihaycode.techvibesservice.model.auth.*;
 import com.haihaycode.techvibesservice.repository.RoleRepository;
 import com.haihaycode.techvibesservice.repository.UserRepository;
 import com.haihaycode.techvibesservice.security.JwtIssuer;
 import com.haihaycode.techvibesservice.security.UserPrincipal;
 import com.haihaycode.techvibesservice.service.UserService;
+import com.haihaycode.techvibesservice.service.mail.EmailService;
+import com.haihaycode.techvibesservice.service.mail.OtpService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,6 +41,9 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final OtpService otpService;
+    private final EmailService emailService;
+
 
     public LoginResponse attemptLogin(String email, String password) {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
@@ -148,6 +151,30 @@ public class AuthService {
         if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
             throw new InvalidInputException("New passwords do not match.");
         }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void sendOtp(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        String otp = otpService.generateOtp(email);
+        emailService.sendOtpEmail(user.getEmail(), otp);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new InvalidInputException("Passwords do not match.");
+        }
+        if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
+            throw new InvalidInputException("Invalid OTP.");
+        }
+        UserEntity user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

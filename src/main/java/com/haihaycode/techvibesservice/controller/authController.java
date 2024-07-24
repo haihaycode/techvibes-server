@@ -55,6 +55,22 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Password changed successfully.", null);
         return ResponseEntity.ok(response);
     }
+    @PreAuthorize("permitAll()")
+    @PostMapping("/auth/forgot-password")
+    public ResponseEntity<ResponseWrapper<Void>> forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
+        authService.sendOtp(request.getEmail());
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "OPT send successfully.", null);
+        return ResponseEntity.ok(response);
+    }
+    @PreAuthorize("permitAll()")
+    @PostMapping("/auth/reset-password")
+    public ResponseEntity<ResponseWrapper<Void>> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Password has been reset successfully.", null);
+        return ResponseEntity.ok(response);
+    }
+
+
 
 
 

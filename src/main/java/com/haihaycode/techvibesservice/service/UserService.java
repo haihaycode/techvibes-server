@@ -5,6 +5,7 @@ import com.haihaycode.techvibesservice.entity.UserEntity;
 
 import com.haihaycode.techvibesservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.management.relation.Role;
@@ -18,6 +19,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     public Optional<UserEntity> findByEmail(String email) {
-        return Optional.ofNullable(userRepository.findByEmail(email));
+        return Optional.ofNullable(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email)));
     }
 }
