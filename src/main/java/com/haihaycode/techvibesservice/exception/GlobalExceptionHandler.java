@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseWrapper<Void>> handleUsernameAlreadyExists(UserAlreadyExistsException ex) {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.CONFLICT, ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }   
+    }
     @ExceptionHandler(RoleNotFoundException.class)
     public ResponseEntity<ResponseWrapper<Void>> handleRoleNotFound(RoleNotFoundException ex) {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.NOT_FOUND, ex.getMessage(), null);
@@ -47,6 +47,14 @@ public class GlobalExceptionHandler {
         ResponseWrapper<String> response = new ResponseWrapper<>(HttpStatus.BAD_REQUEST, errorMessage.toString(), null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidTokenException(InvalidTokenException ex) {
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.UNAUTHORIZED, " Access denied : " + ex.getMessage(), null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)

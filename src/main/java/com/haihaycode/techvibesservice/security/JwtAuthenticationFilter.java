@@ -1,5 +1,6 @@
 package com.haihaycode.techvibesservice.security;
 
+import com.haihaycode.techvibesservice.exception.InvalidTokenException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,15 +19,23 @@ import java.util.Optional;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
-    private final jwtToPrincipalConverter jwtToPrincipalConverter;
+    private final JwtToPrincipalConverter jwtToPrincipalConverter;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        extractTokenFromRequest(request)
-                .map(jwtDecoder::decode)
-                .map(jwtToPrincipalConverter::convert)
-                .map(UserPrincipalAuthenticationToken::new)
-                        .ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+        try {
+            extractTokenFromRequest(request)
+                    .map(jwtDecoder::decode)
+                    .map(jwtToPrincipalConverter::convert)
+                    .map(UserPrincipalAuthenticationToken::new)
+                    .ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+        } catch (InvalidTokenException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            String errorMessage = String.format("{\"error\": \"%s\"}", "UNAUTHORIZED");
+            response.getWriter().write(errorMessage);
+            return;
+        }
         filterChain.doFilter(request, response);
     }
 

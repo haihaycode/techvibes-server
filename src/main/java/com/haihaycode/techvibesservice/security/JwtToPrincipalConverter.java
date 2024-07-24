@@ -1,28 +1,27 @@
 package com.haihaycode.techvibesservice.security;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.haihaycode.techvibesservice.exception.InvalidTokenException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-public class jwtToPrincipalConverter {
+public class JwtToPrincipalConverter {
 
     /*
      *  Cụ thể hàm này sẽ chuyển một đối tượng DecodedJWT thành một đối tượng UserPrincipal
      *  gồm các thuộc tính userId, email, và authorities (vai trò).
      * */
-    public UserPrincipal convert(DecodedJWT jwt) {
+    public UserPrincipal convert(DecodedJWT jwt) throws InvalidTokenException {
         return UserPrincipal.builder()
                 .userId(Long.valueOf(jwt.getSubject()))
                 .email(jwt.getClaim("e").asString())
                 .authorities(extractAuthoritiesFromClaim(jwt))
                 .build();
     }
-
 
     private Set<SimpleGrantedAuthority> extractAuthoritiesFromClaim(DecodedJWT jwt) {
         var claim = jwt.getClaim("a");

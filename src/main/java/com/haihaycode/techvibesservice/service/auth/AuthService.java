@@ -11,11 +11,13 @@ import com.haihaycode.techvibesservice.repository.UserRepository;
 import com.haihaycode.techvibesservice.security.JwtIssuer;
 import com.haihaycode.techvibesservice.security.UserPrincipal;
 import com.haihaycode.techvibesservice.service.UserService;
+import com.haihaycode.techvibesservice.service.image.ImageService;
 import com.haihaycode.techvibesservice.service.mail.EmailService;
 import com.haihaycode.techvibesservice.service.mail.OtpService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -25,9 +27,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,6 +48,7 @@ public class AuthService {
     private final RoleRepository roleRepository;
     private final OtpService otpService;
     private final EmailService emailService;
+    private final ImageService imageService;
 
 
     public LoginResponse attemptLogin(String email, String password) {
@@ -88,7 +94,7 @@ public class AuthService {
         newUser.setCreateDate(new Date());
 
         RoleEntity role = roleRepository.findById(1L)
-                .orElseThrow(() ->  new RoleNotFoundException("Role not found ")); // Thay thế RuntimeException bằng ngoại lệ tùy chỉnh nếu có
+                .orElseThrow(() -> new RoleNotFoundException("Role not found ")); // Thay thế RuntimeException bằng ngoại lệ tùy chỉnh nếu có
         Set<RoleEntity> roles = new HashSet<>();
         roles.add(role);
         newUser.setRoles(roles);
@@ -102,11 +108,9 @@ public class AuthService {
         }
 
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof UserPrincipal)) {
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
             throw new InvalidInputException("Principal is not of type UserPrincipal");
         }
-
-        UserPrincipal userPrincipal = (UserPrincipal) principal;
 
         UserEntity user = userRepository.findById(userPrincipal.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -135,11 +139,9 @@ public class AuthService {
         }
 
         Object principal = authentication.getPrincipal();
-        if (!(principal instanceof UserPrincipal)) {
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
             throw new InvalidInputException("Principal is not of type UserPrincipal");
         }
-
-        UserPrincipal userPrincipal = (UserPrincipal) principal;
 
         UserEntity user = userRepository.findById(userPrincipal.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -177,6 +179,35 @@ public class AuthService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void updateAccount(UpdateUserRequest request, Optional<MultipartFile> file) {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new InvalidInputException("No authentication details found.");
+        }
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof UserPrincipal userPrincipal)) {
+            throw new InvalidInputException("Principal is not of type UserPrincipal");
+        }
+
+        UserEntity user = userRepository.findById(userPrincipal.getUserId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        user.setFullName(request.getFullName());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
+        user.setUpdateDate(new Date());
+
+        if (file.isPresent() && !file.get().isEmpty()) {
+            try {
+                imageService.deleteImage(user.getPhoto(), "image/directory/account/");
+                user.setPhoto(imageService.saveImage(file.get(), "image/directory/account/"));
+            } catch (IOException e) {
+                throw new InvalidInputException(e.getMessage());
+            }
+        }
         userRepository.save(user);
     }
 

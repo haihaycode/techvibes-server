@@ -8,11 +8,15 @@ import com.haihaycode.techvibesservice.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/public")
@@ -70,6 +74,15 @@ public class authController {
         return ResponseEntity.ok(response);
     }
 
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
+    @PutMapping( value = "/auth/account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseWrapper<Void>> updateAccount(@RequestPart UpdateUserRequest request,
+                                                               @RequestParam("file") Optional<MultipartFile> file) {
+        authService.updateAccount(request,file);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.",null);
+        return ResponseEntity.ok(response);
+    }
 
 
 

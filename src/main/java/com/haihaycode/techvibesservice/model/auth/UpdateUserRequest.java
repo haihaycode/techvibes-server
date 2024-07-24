@@ -11,9 +11,7 @@ public class UpdateUserRequest {
     Long userId;
     @NotBlank(message = "Full name is required")
     private String fullName;
-    @Email(message = "Email should be valid")
-    private String email;
     private String address;
-    private String phone;
-    private String photo;
+    private Integer phone;
+
 }
