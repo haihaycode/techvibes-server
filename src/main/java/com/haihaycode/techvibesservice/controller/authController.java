@@ -28,9 +28,10 @@ public class authController {
     @PostMapping("/auth/login")
     @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<LoginResponse>> login(@RequestBody @Validated LoginRequest request) {
-        ResponseWrapper<LoginResponse> response = new ResponseWrapper<>(HttpStatus.OK, "Login successful", authService.attemptLogin(request.getEmail(),request.getPassword()));
+        ResponseWrapper<LoginResponse> response = new ResponseWrapper<>(HttpStatus.OK, "Login successful", authService.attemptLogin(request.getEmail(), request.getPassword()));
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/auth/register")
     @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<Void>> register(@RequestBody @Validated RegisterRequest request) {
@@ -38,11 +39,29 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.CREATED, "Register successful", null);
         return ResponseEntity.ok(response);
     }
+
     @PreAuthorize("permitAll()")
     @PostMapping("/auth/logout")
     public ResponseEntity<ResponseWrapper<Void>> logout() {
         authService.logout();
         return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Logout successful", null));
+    }
+
+    @PreAuthorize("permitAll()")
+    @PostMapping("/auth/verifyEmail")
+    public ResponseEntity<ResponseWrapper<Void>> verifyEmailSendOTP(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        authService.sendOtp(userPrincipal.getEmail());
+        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "OTP sent successfully", null));
+    }
+
+    @PreAuthorize("permitAll()")
+    @PutMapping("/auth/verifyEmail")
+    public ResponseEntity<ResponseWrapper<Void>> verifyEmailConfirm(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                    @RequestBody VerifyEmailRequest request
+    ) {
+        request.setEmail(userPrincipal.getEmail());
+        authService.verifyEmail(request);
+        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Email verified successfully", null));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
@@ -52,6 +71,7 @@ public class authController {
         ResponseWrapper<InfoResponse> response = new ResponseWrapper<>(HttpStatus.OK, "User fetched successfully", infoResponse);
         return ResponseEntity.ok(response);
     }
+
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
     @PostMapping("/auth/change-password")
     public ResponseEntity<ResponseWrapper<Void>> changePassword(@RequestBody @Validated ChangePasswordRequest request) {
@@ -59,6 +79,7 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Password changed successfully.", null);
         return ResponseEntity.ok(response);
     }
+
     @PreAuthorize("permitAll()")
     @PostMapping("/auth/forgot-password")
     public ResponseEntity<ResponseWrapper<Void>> forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
@@ -66,6 +87,7 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "OPT send successfully.", null);
         return ResponseEntity.ok(response);
     }
+
     @PreAuthorize("permitAll()")
     @PostMapping("/auth/reset-password")
     public ResponseEntity<ResponseWrapper<Void>> resetPassword(@RequestBody ResetPasswordRequest request) {
@@ -75,11 +97,11 @@ public class authController {
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
-    @PutMapping( value = "/auth/account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/auth/account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<Void>> updateAccount(@RequestPart UpdateUserRequest request,
                                                                @RequestParam("file") Optional<MultipartFile> file) {
-        authService.updateAccount(request,file);
-        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.",null);
+        authService.updateAccount(request, file);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.", null);
         return ResponseEntity.ok(response);
     }
 
@@ -89,11 +111,13 @@ public class authController {
     public String roleUserAndAdmin(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return "u are logged in username :" + userPrincipal.getUsername() + " , password  : " + userPrincipal.getUserId() + " , role : " + userPrincipal.getAuthorities();
     }
+
     @PreAuthorize("hasAnyRole('USER')")
     @GetMapping("/auth/role/user")
     public String roleUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return "u are logged in username :" + userPrincipal.getUsername() + " , password  : " + userPrincipal.getUserId() + " , role : " + userPrincipal.getAuthorities();
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/auth/role/admin")
     public String roleAdmin(@AuthenticationPrincipal UserPrincipal userPrincipal) {

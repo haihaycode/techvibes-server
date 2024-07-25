@@ -1,6 +1,8 @@
 package com.haihaycode.techvibesservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,8 +49,10 @@ public class UserEntity implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
+    @JsonBackReference
     private List<FavoriteEntity> favorites;
 
     @OneToMany(mappedBy = "account")
+    @JsonBackReference
     private List<OrderEntity> orders;
 }

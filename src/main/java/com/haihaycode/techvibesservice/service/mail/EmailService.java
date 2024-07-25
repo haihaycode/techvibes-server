@@ -18,7 +18,7 @@ public class EmailService {
     public void sendOtpEmail(String to, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Your OTP for Password Reset");
+        message.setSubject("TechVibes - Support");
         message.setText("Your OTP is: " + otp);
         mailSender.send(message);
     }

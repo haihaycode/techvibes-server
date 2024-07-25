@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 public class AuthService {
     private final JwtIssuer jwtIssuer;
     private final AuthenticationManager authenticationManager;
-    private final UserService userService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
@@ -55,8 +54,11 @@ public class AuthService {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
             throw new InvalidInputException("Email or password cannot be empty");
         }
-        var user = userService.findByEmail(email)
+        var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if(!user.getAvailable()) {
+            throw new UsernameNotFoundException("Account not found");
+        }
         try {
             var authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -82,7 +84,7 @@ public class AuthService {
         if (request.getEmail() == null || request.getEmail().isEmpty() || request.getPassword() == null || request.getPassword().isEmpty()) {
             throw new InvalidInputException("Email or password cannot be empty");
         }
-        userService.findByEmail(request.getEmail())
+        userRepository.findByEmail(request.getEmail())
                 .ifPresent(user -> {
                     throw new UserAlreadyExistsException("User already exists with email : " + request.getEmail());
                 });
@@ -93,11 +95,7 @@ public class AuthService {
         newUser.setAvailable(true);
         newUser.setCreateDate(new Date());
 
-        RoleEntity role = roleRepository.findById(1L)
-                .orElseThrow(() -> new RoleNotFoundException("Role not found ")); // Thay thế RuntimeException bằng ngoại lệ tùy chỉnh nếu có
-        Set<RoleEntity> roles = new HashSet<>();
-        roles.add(role);
-        newUser.setRoles(roles);
+
         userRepository.save(newUser);
     }
 
@@ -181,6 +179,23 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
     }
+
+    @Transactional
+    public void verifyEmail(VerifyEmailRequest request) {
+        if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
+            throw new InvalidInputException("Invalid OTP.");
+        }
+        UserEntity user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
+
+                RoleEntity role = roleRepository.findById(2L)//ROLE_USER IN DATABASE
+                .orElseThrow(() -> new RoleNotFoundException("Role not found "));
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
+
 
     public void updateAccount(UpdateUserRequest request, Optional<MultipartFile> file) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();

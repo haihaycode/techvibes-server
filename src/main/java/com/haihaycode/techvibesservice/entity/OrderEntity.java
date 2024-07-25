@@ -1,5 +1,6 @@
 package com.haihaycode.techvibesservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,6 +28,7 @@ public class OrderEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonManagedReference
     private UserEntity account;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)

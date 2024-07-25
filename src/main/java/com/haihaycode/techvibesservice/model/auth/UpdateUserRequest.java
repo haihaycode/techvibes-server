@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 public class UpdateUserRequest {
     Long userId;
-    @NotBlank(message = "Full name is required")
     private String fullName;
     private String address;
     private Integer phone;
+    private String email;
 
 }
