@@ -74,7 +74,6 @@ public class authController {
         return ResponseEntity.ok(response);
     }
 
-
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
     @PutMapping( value = "/auth/account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<Void>> updateAccount(@RequestPart UpdateUserRequest request,
@@ -83,9 +82,6 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.",null);
         return ResponseEntity.ok(response);
     }
-
-
-
 
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")

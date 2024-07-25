@@ -12,7 +12,6 @@
    Quản Lý Người Dùng: Admin có thể xem và quản lý thông tin người dùng, bao gồm việc cấp quyền cho các người dùng khác
    và xóa tài khoản nếu cần.
    Quản Lý Quyền: Admin có thể cấp quyền cho các vai trò khác như nhân viên và khách hàng.
-   Quản Lý Quyền: Admin có thể cấp quyền cho các vai trò khác như nhân viên và khách hàng.
    Xem Báo Cáo: Admin có thể xem báo cáo về doanh thu, sản phẩm bán chạy, và các số liệu liên quan khác.
 3. Quyền Nhân Viên
 
