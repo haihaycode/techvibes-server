@@ -43,6 +43,10 @@ public class UserService {
     public Page<UserEntity> findUsersByCriteria(String keyword, Boolean available, String roleName, Pageable pageable) {
         return userRepository.findUsersByCriteria(keyword, available, roleName, pageable);
     }
+    public UserEntity getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+    }
 
     @Transactional
     public UserEntity updateUser(Long userId, String fullName, Integer phone, String address, String email) {
@@ -103,16 +107,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<RoleEntity> getRoles(){
-        return roleRepository.findAll();
-    }
 
 
-    public ByteArrayInputStream exportUsersToExcel()  {
+
+    public ByteArrayInputStream exportUsersToExcel() {
         List<UserEntity> users = userRepository.findAll();
         try (Workbook workbook = new XSSFWorkbook();
-             ByteArrayOutputStream out = new ByteArrayOutputStream())
-        {
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Users");
 
             // Create header row
@@ -151,7 +152,45 @@ public class UserService {
         }
     }
 
+    public ByteArrayInputStream exportUserToExcelById(Long userId) {
+        Optional<UserEntity> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            throw new UsernameNotFoundException("User not found with ID: " + userId);
+        }
 
+        UserEntity user = userOptional.get();
+
+        try (Workbook workbook = new XSSFWorkbook();
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("User");
+
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("User ID");
+            headerRow.createCell(1).setCellValue("Email");
+            headerRow.createCell(2).setCellValue("Full Name");
+            headerRow.createCell(3).setCellValue("Phone");
+            headerRow.createCell(4).setCellValue("Address");
+            headerRow.createCell(5).setCellValue("Available");
+            headerRow.createCell(6).setCellValue("Roles");
+
+            // Create data row
+            Row row = sheet.createRow(1);
+            row.createCell(0).setCellValue(user.getUserId());
+            row.createCell(1).setCellValue(user.getEmail());
+            row.createCell(2).setCellValue(user.getFullName() != null ? user.getFullName() : "");
+            row.createCell(3).setCellValue(String.valueOf(user.getPhone() != null ? user.getPhone() : "N/A"));
+            row.createCell(4).setCellValue(user.getAddress() != null ? user.getAddress() : "");
+            row.createCell(5).setCellValue(user.getAvailable() ? "Yes" : "No");
+            row.createCell(6).setCellValue(user.getRoles().stream().map(RoleEntity::getName).collect(Collectors.joining(", ")));
+
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        } catch (IOException e) {
+            throw new ExcelExportException("Failed to export user to Excel");
+        }
+    }
 
 
 }

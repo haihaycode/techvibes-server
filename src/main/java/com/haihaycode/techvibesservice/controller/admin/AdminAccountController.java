@@ -4,6 +4,7 @@ import com.haihaycode.techvibesservice.entity.RoleEntity;
 import com.haihaycode.techvibesservice.entity.UserEntity;
 import com.haihaycode.techvibesservice.model.ResponseWrapper;
 import com.haihaycode.techvibesservice.model.auth.UpdateUserRequest;
+import com.haihaycode.techvibesservice.service.RoleService;
 import com.haihaycode.techvibesservice.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class AdminAccountController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<Page<UserEntity>>> findUsersByCriteria(
@@ -57,6 +59,15 @@ public class AdminAccountController {
         ResponseWrapper<Page<UserEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Users fetched successfully", users);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/users/get/{userId}")
+    @PreAuthorize("hasRole('ADMIN')") //or #userId == principal.userId"
+    public ResponseEntity<ResponseWrapper<UserEntity>> getUserById(@PathVariable Long userId) {
+        UserEntity user = userService.getUserById(userId);
+        ResponseWrapper<UserEntity> response = new ResponseWrapper<>(HttpStatus.OK, "User fetched successfully", user);
+        return ResponseEntity.ok(response);
+    }
+
     @PutMapping("/users/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<UserEntity>> updateUser(
@@ -98,14 +109,8 @@ public class AdminAccountController {
         userService.removeUserRoles(userId, roleNames);
         return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Roles removed successfully", null));
     }
-
-    @GetMapping("/roles")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseWrapper<List<RoleEntity>>> getRoles() {
-        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Roles fetched successfully", userService.getRoles()));
-    }
     @GetMapping("/users/export")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<InputStreamResource> exportUsersToExcel() {
         ByteArrayInputStream inputStream = userService.exportUsersToExcel();
         HttpHeaders headers = new HttpHeaders();
@@ -114,6 +119,20 @@ public class AdminAccountController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new InputStreamResource(inputStream));
+    }
+
+    @GetMapping("/users/export/{userId}")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<byte[]> exportUserToExcelById(@PathVariable Long userId) {
+        ByteArrayInputStream inputStream = userService.exportUserToExcelById(userId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=account_" + userId + ".xlsx");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(inputStream.readAllBytes());
     }
 
 
