@@ -10,6 +10,7 @@ import com.haihaycode.techvibesservice.model.CategoryRequest;
 import com.haihaycode.techvibesservice.repository.CategoryRepository;
 import com.haihaycode.techvibesservice.service.ExportService.ExcelDateParserService;
 import com.haihaycode.techvibesservice.service.image.ImageService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -23,12 +24,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;

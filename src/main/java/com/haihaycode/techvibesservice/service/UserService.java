@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
 
     private final UserRepository userRepository;
@@ -48,7 +49,7 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
     }
 
-    @Transactional
+
     public UserEntity updateUser(Long userId, String fullName, Integer phone, String address, String email) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));

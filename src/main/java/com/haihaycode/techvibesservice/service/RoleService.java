@@ -3,12 +3,14 @@ package com.haihaycode.techvibesservice.service;
 import com.haihaycode.techvibesservice.entity.RoleEntity;
 import com.haihaycode.techvibesservice.exception.RoleNotFoundException;
 import com.haihaycode.techvibesservice.repository.RoleRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RoleService {
     private final RoleRepository roleRepository;
     public List<RoleEntity> getRoles() {

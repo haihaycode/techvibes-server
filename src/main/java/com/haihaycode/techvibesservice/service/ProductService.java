@@ -10,6 +10,7 @@ import com.haihaycode.techvibesservice.repository.CategoryRepository;
 import com.haihaycode.techvibesservice.repository.ProductRepository;
 import com.haihaycode.techvibesservice.service.ExportService.ExcelDateParserService;
 import com.haihaycode.techvibesservice.service.image.ImageService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -32,6 +33,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
