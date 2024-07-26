@@ -21,6 +21,8 @@ public class ProductEntity {
     private String name;
     private String image;
     private Long price;
+    private Long quantity;
+    private Long discount;
 
     @Column(columnDefinition = "LONGTEXT")
     private String description;

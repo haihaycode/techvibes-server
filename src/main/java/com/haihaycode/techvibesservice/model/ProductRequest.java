@@ -11,4 +11,6 @@ public class ProductRequest {
     private String description;
     private String descriptionSort;
     private Long categoryId;
+    private Long quantity;
+    private Long discount;
 }

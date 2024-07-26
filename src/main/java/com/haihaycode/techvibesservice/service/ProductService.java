@@ -79,6 +79,8 @@ public class ProductService {
         productEntity.setPrice(request.getPrice());
         productEntity.setAvailable(true);
         productEntity.setCreateDate(new Date());
+        productEntity.setDiscount(request.getDiscount());
+        productEntity.setQuantity(request.getQuantity());
         productEntity.setDescriptionSort(request.getDescriptionSort());
         productEntity.setCategory(category);
         if (file.isPresent() && !file.get().isEmpty()) {
@@ -103,6 +105,8 @@ public class ProductService {
         productEntity.setName(request.getName());
         productEntity.setDescription(request.getDescription());
         productEntity.setPrice(request.getPrice());
+        productEntity.setDiscount(request.getDiscount());
+        productEntity.setQuantity(request.getQuantity());
         productEntity.setUpdateDate(new Date());
         productEntity.setDescriptionSort(request.getDescriptionSort());
         productEntity.setCategory(category);
@@ -144,6 +148,8 @@ public class ProductService {
             headerRow.createCell(7).setCellValue("Update Date");
             headerRow.createCell(8).setCellValue("Available");
             headerRow.createCell(9).setCellValue("Category ID");
+            headerRow.createCell(10).setCellValue("Quantity");
+            headerRow.createCell(11).setCellValue("Discount");
 
             // Create data rows
             int rowNum = 1;
@@ -173,6 +179,8 @@ public class ProductService {
                 row.createCell(7).setCellValue(product.getUpdateDate() != null ? product.getUpdateDate().toString() : null);
                 row.createCell(8).setCellValue(product.getAvailable() ? "Yes" : "No");
                 row.createCell(9).setCellValue(product.getCategory() != null ? product.getCategory().getId() : null);
+                row.createCell(10).setCellValue(product.getQuantity() != null ? product.getQuantity() : 0);
+                row.createCell(11).setCellValue(product.getDiscount() != null ? product.getDiscount() : 0);
             }
 
             workbook.write(out);
@@ -208,6 +216,8 @@ public class ProductService {
             headerRow.createCell(7).setCellValue("Update Date");
             headerRow.createCell(8).setCellValue("Available");
             headerRow.createCell(9).setCellValue("Category ID");
+            headerRow.createCell(10).setCellValue("Quantity");
+            headerRow.createCell(11).setCellValue("Discount");
 
             // Create data row
             Row row = sheet.createRow(1);
@@ -235,6 +245,8 @@ public class ProductService {
             row.createCell(7).setCellValue(product.getUpdateDate() != null ? product.getUpdateDate().toString() : null);
             row.createCell(8).setCellValue(product.getAvailable() ? "Yes" : "No");
             row.createCell(9).setCellValue(product.getCategory() != null ? product.getCategory().getId() : null);
+            row.createCell(10).setCellValue(product.getQuantity() != null ? product.getQuantity() : 0);
+            row.createCell(11).setCellValue(product.getDiscount() != null ? product.getDiscount() : 0);
 
             workbook.write(out);
             return new ByteArrayInputStream(out.toByteArray());
@@ -280,12 +292,15 @@ public class ProductService {
                 product.setAvailable("Yes".equalsIgnoreCase(row.getCell(8).getStringCellValue()));
 
                 Long categoryId = ((Double) row.getCell(9).getNumericCellValue()).longValue();
+
                 Optional<CategoryEntity> categoryOptional = categoryRepository.findById(categoryId);
                 if (categoryOptional.isPresent()) {
                     product.setCategory(categoryOptional.get());
                 } else {
                     throw new ResourceNotFoundException("Category not found with ID: " + categoryId);
                 }
+                product.setQuantity( (long)row.getCell(10).getNumericCellValue());
+                product.setDiscount( (long)row.getCell(11).getNumericCellValue());
 
                 products.add(product);
             }

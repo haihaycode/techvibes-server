@@ -16,7 +16,8 @@ import java.util.Optional;
 public interface FavoriteRepository extends JpaRepository<FavoriteEntity, Long> {
     Page<FavoriteEntity> findByUserUserId(Long userId, Pageable pageable);
     Page<FavoriteEntity> findByProductId(Long productId, Pageable pageable);
-    Optional<FavoriteEntity> findByUserIdAndProductId(Long userId, Long productId);
+    @Query("SELECT f FROM FavoriteEntity f WHERE f.user.userId = :userId AND f.product.id = :productId")
+    Optional<FavoriteEntity> findByUserIdAndProductId(@Param("userId") Long userId, @Param("productId") Long productId);
 
     @Query("SELECT f FROM FavoriteEntity f WHERE "
             + "(:userId IS NULL OR f.user.userId = :userId) AND "

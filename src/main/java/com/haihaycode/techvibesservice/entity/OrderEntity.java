@@ -20,6 +20,8 @@ public class OrderEntity {
     private String fullName;
     private Integer phone;
     private Long totalPrice;
+    @Column(columnDefinition = "LONGTEXT")
+    private String notes;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
