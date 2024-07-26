@@ -206,10 +206,8 @@ public class AuthService {
         if (!(principal instanceof UserPrincipal userPrincipal)) {
             throw new InvalidInputException("Principal is not of type UserPrincipal");
         }
-
         UserEntity user = userRepository.findById(userPrincipal.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
         user.setFullName(request.getFullName());
         user.setAddress(request.getAddress());
         user.setPhone(request.getPhone());

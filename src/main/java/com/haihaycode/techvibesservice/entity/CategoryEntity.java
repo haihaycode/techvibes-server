@@ -28,6 +28,7 @@ public class CategoryEntity {
     private Date createDate;
     @Temporal(TemporalType.TIMESTAMP)
     private Date updateDate;
+    private Boolean available;
 
     @JsonIgnore
     @OneToMany(mappedBy = "category")
