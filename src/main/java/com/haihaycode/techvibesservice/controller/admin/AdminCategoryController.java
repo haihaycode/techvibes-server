@@ -102,6 +102,7 @@ public class AdminCategoryController {
                 .headers(headers)
                 .body(new InputStreamResource(inputStream));
     }
+
     @GetMapping("/category/export/excel/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<InputStreamResource> exportCategoryByIdToExcel(@PathVariable Long id) {
@@ -113,11 +114,12 @@ public class AdminCategoryController {
                 .headers(headers)
                 .body(new InputStreamResource(inputStream));
     }
+
     @PostMapping("/category/import/excel")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ResponseWrapper<String>> importCategoriesFromExcel(@RequestParam("file") MultipartFile file) {
-            categoryService.importCategoriesFromExcel(file);
-            return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Categories imported successfully.", null));
+        categoryService.importCategoriesFromExcel(file);
+        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Categories imported successfully.", null));
 
     }
 

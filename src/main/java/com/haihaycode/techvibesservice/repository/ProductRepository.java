@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
@@ -19,15 +20,30 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             + "(:startDate IS NULL OR p.createDate >= :startDate) AND "
             + "(:endDate IS NULL OR p.createDate <= :endDate) AND "
             + "(:available IS NULL OR p.available = :available) AND "
-            + "(:categoryName IS NULL OR p.category.name LIKE %:categoryName%) AND "
-            + "(:keyword IS NULL OR (p.name LIKE %:keyword% OR p.description LIKE %:keyword%  OR p.descriptionSort LIKE %:keyword% OR p.category.name LIKE %:keyword%)) "
+            + "(:categoryId IS NULL OR (p.category.id = :categoryId AND p.category.available = :availableCategory)) AND "
+            + "(:availableCategory IS NULL OR p.category.available = :availableCategory) AND "
+            + "(:keyword IS NULL OR (p.name LIKE %:keyword% OR p.description LIKE %:keyword% OR p.category.name LIKE %:keyword%))"
     )
-    Page<ProductEntity> findProductsByCriteria(@Param("minPrice") Long minPrice,
-                                         @Param("maxPrice") Long maxPrice,
-                                         @Param("startDate") Date startDate,
-                                         @Param("endDate") Date endDate,
-                                         @Param("categoryName") String categoryName,
-                                         @Param("keyword") String keyword,
-                                         @Param("available") Boolean available,
-                                         Pageable pageable);
+    Page<ProductEntity> findProductsByCriteria(
+            @Param("minPrice") Long minPrice,
+            @Param("maxPrice") Long maxPrice,
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("categoryId") Long categoryId,
+            @Param("keyword") String keyword,
+            @Param("available") Boolean available,
+            @Param("availableCategory") Boolean availableCategory,
+            Pageable pageable
+    );
+
+    @Query("SELECT p FROM ProductEntity p WHERE "
+            + "(:availableCategory IS NULL OR p.category.available = :availableCategory) AND "
+            + "(:available IS NULL OR p.available = :available) AND "
+            + "p.id = :id")
+    Optional<ProductEntity> findProductById(
+            @Param("id") Long id,
+            @Param("available") Boolean available,
+            @Param("availableCategory") Boolean availableCategory
+    );
+
 }

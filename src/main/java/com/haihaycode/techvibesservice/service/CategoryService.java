@@ -35,7 +35,7 @@ public class CategoryService {
     private final ExcelDateParserService excelDateParserService;
 
     public Page<CategoryEntity> findCategoriesByCriteria(String keyword, Boolean available, Date startDate, Date endDate, Pageable pageable) {
-        return categoryRepository.findCategoriesByCriteria(keyword, available,startDate, endDate, pageable);
+        return categoryRepository.findCategoriesByCriteria(keyword, available, startDate, endDate, pageable);
     }
 
     public CategoryEntity getCategoryById(Long id) {
@@ -44,7 +44,7 @@ public class CategoryService {
     }
 
 
-    public CategoryEntity createCategory(CategoryRequest request ,  Optional<MultipartFile> file) {
+    public CategoryEntity createCategory(CategoryRequest request, Optional<MultipartFile> file) {
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setName(request.getName());
         categoryEntity.setDescription(request.getDescription());
@@ -60,7 +60,7 @@ public class CategoryService {
         return categoryRepository.save(categoryEntity);
     }
 
-    public CategoryEntity updateCategory(Long id,CategoryRequest request ,  Optional<MultipartFile> file) {
+    public CategoryEntity updateCategory(Long id, CategoryRequest request, Optional<MultipartFile> file) {
         var categoryEntity = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
 
@@ -83,8 +83,9 @@ public class CategoryService {
         var categoryEntity = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category not found with id: " + id));
         categoryEntity.setAvailable(!categoryEntity.getAvailable());
-       return categoryRepository.save(categoryEntity);
+        return categoryRepository.save(categoryEntity);
     }
+
     public ByteArrayInputStream exportCategoriesToExcel() {
         List<CategoryEntity> categories = categoryRepository.findAll();
         try (Workbook workbook = new XSSFWorkbook();
@@ -110,8 +111,8 @@ public class CategoryService {
                 row.createCell(1).setCellValue(category.getName());
                 row.createCell(2).setCellValue(category.getDescription());
                 row.createCell(3).setCellValue(category.getImage());
-                row.createCell(4).setCellValue(category.getCreateDate() != null ? category.getCreateDate().toString() : null );
-                row.createCell(5).setCellValue(category.getUpdateDate() != null ? category.getUpdateDate().toString() : null );
+                row.createCell(4).setCellValue(category.getCreateDate() != null ? category.getCreateDate().toString() : null);
+                row.createCell(5).setCellValue(category.getUpdateDate() != null ? category.getUpdateDate().toString() : null);
                 row.createCell(6).setCellValue(category.getAvailable() ? "Yes" : "No");
             }
 
@@ -192,8 +193,6 @@ public class CategoryService {
             throw new ExcelExportException("Failed to import categories from Excel");
         }
     }
-
-
 
 
 }
