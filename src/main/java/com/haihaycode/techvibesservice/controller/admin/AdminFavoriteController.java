@@ -57,14 +57,6 @@ public class AdminFavoriteController {
         ResponseWrapper<Page<FavoriteEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Favorite retrieved successfully", favoriteService.getFavoritesByCriteria(userId, productId, startDate, endDate, pageable));
         return ResponseEntity.ok(response);
     }
-
-
-    @PostMapping("/favorite")//để bên public
-    @PreAuthorize("hasAnyRole('ADMIN','USER','STAFF')")
-    public ResponseEntity<ResponseWrapper<Void>> addOrRemoveFavorite(@AuthenticationPrincipal UserPrincipal principal, @RequestParam Long productId) {
-        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK,  favoriteService.favorite(principal.getUserId(), productId), null));
-    }
-
     @GetMapping("/favorite/export/excel")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<InputStreamResource> exportProductsToExcel() {

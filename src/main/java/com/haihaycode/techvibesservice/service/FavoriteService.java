@@ -15,7 +15,9 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -62,6 +64,15 @@ public class FavoriteService {
         }
     }
 
+    public Page<ProductEntity> getFavorite(Long userId, int page, int limit, Sort.Direction sortDirection, String sortField) {
+        Optional<UserEntity> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new ResourceNotFoundException("User not found with ID: " + userId);
+        }
+
+        Pageable pageable = PageRequest.of(page, limit, Sort.by(new Sort.Order(sortDirection, sortField)));
+        return favoriteRepository.findByUserId(userId, pageable);
+    }
     public ByteArrayInputStream exportFavoritesToExcel() {
         List<FavoriteEntity> favoriteEntityList = favoriteRepository.findAll();
         try (Workbook workbook = new XSSFWorkbook();

@@ -86,7 +86,7 @@ public class AdminOrderController {
 
 
     @GetMapping("/order/export/excel")
-//    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<InputStreamResource> exportAllOrdersAndProductsToExcel() {
         ByteArrayInputStream inputStream = orderService.exportAllOrdersAndProductsToExcel();
         HttpHeaders headers = new HttpHeaders();
@@ -96,5 +96,7 @@ public class AdminOrderController {
                 .headers(headers)
                 .body(new InputStreamResource(inputStream));
     }
+
+
 
 }

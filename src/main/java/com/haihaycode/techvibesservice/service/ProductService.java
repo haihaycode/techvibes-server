@@ -69,6 +69,11 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
     }
 
+    public ProductEntity getProductForClientById(Long productId) {
+        return productRepository.findProductById(productId,true,true)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+    }
+
     public ProductEntity createProduct(ProductRequest request,Optional<MultipartFile> file){
         CategoryEntity category = categoryRepository.findById(request.getCategoryId()).orElseThrow(
                 ()-> new ResourceNotFoundException("Category not found ")
