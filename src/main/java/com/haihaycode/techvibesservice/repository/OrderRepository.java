@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
@@ -104,4 +105,6 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
             "JOIN o.account a " +
             "WHERE (:orderId IS NULL OR o.id = :orderId)")
     Page<ProductEntity> getProductsByOrderId(@Param("orderId") Long orderId, Pageable pageable);
+
+    Optional<OrderEntity> findByOrderCodeAndPhone(String orderCode, int phone);
 }

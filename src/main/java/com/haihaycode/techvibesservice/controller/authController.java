@@ -21,6 +21,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/public")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class authController {
     @Autowired
     public AuthService authService;
@@ -28,7 +29,7 @@ public class authController {
     @PostMapping("/auth/login")
     @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<LoginResponse>> login(@RequestBody @Validated LoginRequest request) {
-        ResponseWrapper<LoginResponse> response = new ResponseWrapper<>(HttpStatus.OK, "Login successful", authService.attemptLogin(request.getEmail(), request.getPassword()));
+        ResponseWrapper<LoginResponse> response = new ResponseWrapper<>(HttpStatus.OK, "Đăng Nhập Thành Công", authService.attemptLogin(request.getEmail(), request.getPassword()));
         return ResponseEntity.ok(response);
     }
 
@@ -36,7 +37,7 @@ public class authController {
     @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<Void>> register(@RequestBody @Validated RegisterRequest request) {
         authService.registerNewUser(request);
-        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.CREATED, "Register successful", null);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.CREATED, "Đăng ký thành công", null);
         return ResponseEntity.ok(response);
     }
 
@@ -47,21 +48,23 @@ public class authController {
         return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Logout successful", null));
     }
 
-    @PreAuthorize("permitAll()")
+
     @PostMapping("/auth/verifyEmail")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<Void>> verifyEmailSendOTP(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         authService.sendOtp(userPrincipal.getEmail());
-        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "OTP sent successfully", null));
+        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Gửi mã thành công ", null));
     }
 
-    @PreAuthorize("permitAll()")
+
     @PutMapping("/auth/verifyEmail")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<ResponseWrapper<Void>> verifyEmailConfirm(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                     @RequestBody VerifyEmailRequest request
     ) {
         request.setEmail(userPrincipal.getEmail());
         authService.verifyEmail(request);
-        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Email verified successfully", null));
+        return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK, "Tài khoản của bạn đã được xác minh", null));
     }
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
@@ -84,7 +87,7 @@ public class authController {
     @PostMapping("/auth/forgot-password")
     public ResponseEntity<ResponseWrapper<Void>> forgotPassword(@RequestBody @Validated ForgotPasswordRequest request) {
         authService.sendOtp(request.getEmail());
-        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "OPT send successfully.", null);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Gửi mã thành công.", null);
         return ResponseEntity.ok(response);
     }
 
@@ -92,10 +95,9 @@ public class authController {
     @PostMapping("/auth/reset-password")
     public ResponseEntity<ResponseWrapper<Void>> resetPassword(@RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
-        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Password has been reset successfully.", null);
+        ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Mật khẩu đã được khôi phục .", null);
         return ResponseEntity.ok(response);
     }
-
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
     @PutMapping(value = "/auth/account", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseWrapper<Void>> updateAccount(@RequestPart UpdateUserRequest request,
@@ -104,6 +106,10 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.", null);
         return ResponseEntity.ok(response);
     }
+
+
+
+
 
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")

@@ -52,12 +52,12 @@ public class AuthService {
 
     public LoginResponse attemptLogin(String email, String password) {
         if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
-            throw new InvalidInputException("Email or password cannot be empty");
+            throw new InvalidInputException("Email or password không được rỗng");
         }
         var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Người dùng không tồn tại"));
         if(!user.getAvailable()) {
-            throw new UsernameNotFoundException("Account not found");
+            throw new UsernameNotFoundException("Người dùng không tồn tại");
         }
         try {
             var authentication = authenticationManager.authenticate(
@@ -76,17 +76,17 @@ public class AuthService {
                     .accessToken(token)
                     .build();
         } catch (AuthenticationException e) {
-            throw new InvalidInputException("Invalid email or password");
+            throw new InvalidInputException("Tài khoản hoặc mật khẩu không đúng");
         }
     }
 
     public void registerNewUser(RegisterRequest request) {
         if (request.getEmail() == null || request.getEmail().isEmpty() || request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new InvalidInputException("Email or password cannot be empty");
+            throw new InvalidInputException("Tài khoản mật khẩu không được rỗng");
         }
         userRepository.findByEmail(request.getEmail())
                 .ifPresent(user -> {
-                    throw new UserAlreadyExistsException("User already exists with email : " + request.getEmail());
+                    throw new UserAlreadyExistsException("Tài khoản đã tồn tại ");
                 });
 
         UserEntity newUser = new UserEntity();
@@ -168,13 +168,13 @@ public class AuthService {
     @Transactional
     public void resetPassword(ResetPasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new InvalidInputException("Passwords do not match.");
+            throw new InvalidInputException("Mât khẩu xác minh không trùng khớp.");
         }
         if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
-            throw new InvalidInputException("Invalid OTP.");
+            throw new InvalidInputException("OTP không hợp lệ .");
         }
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng có email : " + request.getEmail()));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
@@ -183,13 +183,13 @@ public class AuthService {
     @Transactional
     public void verifyEmail(VerifyEmailRequest request) {
         if (!otpService.validateOtp(request.getEmail(), request.getOtp())) {
-            throw new InvalidInputException("Invalid OTP.");
+            throw new InvalidInputException("OTP không hợp lệ  .");
         }
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản : " + request.getEmail()));
 
                 RoleEntity role = roleRepository.findById(2L)//ROLE_USER IN DATABASE
-                .orElseThrow(() -> new RoleNotFoundException("Role not found "));
+                .orElseThrow(() -> new RoleNotFoundException("Đã có lỗi , vui lòng thử lại sau ( không tìm thấy quyền )  "));
         Set<RoleEntity> roles = new HashSet<>();
         roles.add(role);
         user.setRoles(roles);

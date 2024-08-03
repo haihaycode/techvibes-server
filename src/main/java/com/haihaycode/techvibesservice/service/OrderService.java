@@ -39,6 +39,11 @@ public class OrderService {
         return orderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + id));
     }
 
+    //client tra cứu đơn hàng đựa trên mã đơn hàng và số điện thoại
+    public Optional<OrderEntity> getOrderDetails(String orderCode, int phone) {
+        return orderRepository.findByOrderCodeAndPhone(orderCode, phone);
+    }
+
     public OrderEntity updateOrderStatus(Long orderId, Long statusId,String notes) {
         OrderEntity order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + orderId));

@@ -16,6 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AdminRoleController {
 
     @Autowired

@@ -4,10 +4,12 @@ import com.haihaycode.techvibesservice.entity.RoleEntity;
 import com.haihaycode.techvibesservice.entity.UserEntity;
 
 import com.haihaycode.techvibesservice.exception.ExcelExportException;
+import com.haihaycode.techvibesservice.exception.InvalidInputException;
 import com.haihaycode.techvibesservice.exception.RoleNotFoundException;
 import com.haihaycode.techvibesservice.exception.UserAlreadyExistsException;
 import com.haihaycode.techvibesservice.repository.RoleRepository;
 import com.haihaycode.techvibesservice.repository.UserRepository;
+import com.haihaycode.techvibesservice.service.image.ImageService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,6 +18,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -36,9 +40,21 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ImageService imageService;
 
     public Optional<UserEntity> findByEmail(String email) {
         return Optional.ofNullable(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email)));
+    }
+
+    public byte[] getImage(String filename){
+        byte[] imageData = new byte[0];
+        try {
+            imageData = imageService.loadImageAsResource(filename,"image/directory/account/");
+        } catch (IOException e) {
+            throw new InvalidInputException("Could not load");
+        }
+
+        return imageData;
     }
 
     public Page<UserEntity> findUsersByCriteria(String keyword, Boolean available, String roleName, Pageable pageable) {
@@ -46,17 +62,17 @@ public class UserService {
     }
     public UserEntity getUserById(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng id : " + userId));
     }
 
 
     public UserEntity updateUser(Long userId, String fullName, Integer phone, String address, String email) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("không tìm thấy người dùng : " + userId));
         userRepository.findByEmail(email)
                 .ifPresent(existingUser -> {
                     if (!existingUser.getUserId().equals(userId)) {
-                        throw new UserAlreadyExistsException("User already exists with email: " + email);
+                        throw new UserAlreadyExistsException("Có tài khoản đã tồn tại tới email đó rồi : " + email);
                     }
                 });
         user.setFullName(fullName);
@@ -69,30 +85,40 @@ public class UserService {
 
     public UserEntity updateUserAvailability(Long userId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng id : " + userId));
         user.setAvailable(!user.getAvailable());
         return userRepository.save(user);
     }
 
     public void addUserRoles(Long userId, List<String> roleNames) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng id : " + userId));
 
-        Set<RoleEntity> roles = new HashSet<>(user.getRoles() != null ? user.getRoles() : new HashSet<>());
+        // Nếu mảng quyền mới trống, xóa hết quyền của người dùng
+        if (roleNames == null || roleNames.isEmpty()) {
+            user.setRoles(new HashSet<>());
+        } else {
+            // Tạo một tập hợp mới để lưu các quyền
+            Set<RoleEntity> roles = new HashSet<>();
 
-        for (String roleName : roleNames) {
-            RoleEntity role = roleRepository.findByName(roleName)
-                    .orElseThrow(() -> new RoleNotFoundException("Role not found: " + roleName));
-            roles.add(role);
+            // Duyệt qua danh sách quyền mới
+            for (String roleName : roleNames) {
+                RoleEntity role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RoleNotFoundException("Quyền không tồn tại : " + roleName));
+                roles.add(role);
+            }
+
+
+            user.setRoles(roles);
         }
 
-        user.setRoles(roles);
+        // Lưu người dùng với các quyền đã cập nhật
         userRepository.save(user);
     }
 
     public void removeUserRoles(Long userId, List<String> roleNames) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy người dùng id : " + userId));
 
         Set<RoleEntity> roles = user.getRoles();
         if (roles == null) {

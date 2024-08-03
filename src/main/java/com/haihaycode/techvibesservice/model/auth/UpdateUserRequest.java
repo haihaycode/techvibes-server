@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UpdateUserRequest {
-    Long userId;
+    private Long userId;
     private String fullName;
     private String address;
     private Integer phone;
