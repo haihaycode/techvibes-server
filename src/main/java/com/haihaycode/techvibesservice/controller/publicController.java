@@ -1,5 +1,7 @@
 package com.haihaycode.techvibesservice.controller;
 
+import com.haihaycode.techvibesservice.service.CategoryService;
+import com.haihaycode.techvibesservice.service.ProductService;
 import com.haihaycode.techvibesservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,12 +16,28 @@ import org.springframework.web.bind.annotation.*;
 public class publicController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private CategoryService categoryService;
 
-    @GetMapping("/product/image/{filename}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
+    @GetMapping("/account/image/{filename}")
+    public ResponseEntity<byte[]> getImageAccount(@PathVariable String filename) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(userService.getImage(filename), headers, HttpStatus.OK);
+    }
+    @GetMapping("/product/image/{filename}")
+    public ResponseEntity<byte[]> getImageProduct(@PathVariable String filename) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(productService.getImage(filename), headers, HttpStatus.OK);
+    }
+    @GetMapping("/category/image/{filename}")
+    public ResponseEntity<byte[]> getImageCategory(@PathVariable String filename) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(categoryService.getImage(filename), headers, HttpStatus.OK);
     }
 
     @GetMapping("/database")

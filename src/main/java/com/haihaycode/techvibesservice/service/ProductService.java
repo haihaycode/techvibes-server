@@ -133,6 +133,17 @@ public class ProductService {
         return productRepository.save(productEntity);
     }
 
+    public byte[] getImage(String filename){
+        byte[] imageData = new byte[0];
+        try {
+            imageData = imageService.loadImageAsResource(filename,"image/directory/product/");
+        } catch (IOException e) {
+            throw new InvalidInputException("Could not load");
+        }
+
+        return imageData;
+    }
+
 
 
     public ByteArrayInputStream exportProductsToExcel() {

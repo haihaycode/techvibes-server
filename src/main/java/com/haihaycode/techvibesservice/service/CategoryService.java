@@ -33,7 +33,16 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ImageService imageService;
     private final ExcelDateParserService excelDateParserService;
+    public byte[] getImage(String filename){
+        byte[] imageData = new byte[0];
+        try {
+            imageData = imageService.loadImageAsResource(filename,"image/directory/category/");
+        } catch (IOException e) {
+            throw new InvalidInputException("Could not load");
+        }
 
+        return imageData;
+    }
     public Page<CategoryEntity> findCategoriesByCriteria(String keyword, Boolean available, Date startDate, Date endDate, Pageable pageable) {
         return categoryRepository.findCategoriesByCriteria(keyword, available, startDate, endDate, pageable);
     }
@@ -68,6 +77,7 @@ public class CategoryService {
         categoryEntity.setDescription(request.getDescription());
         categoryEntity.setUpdateDate(new Date());
         categoryEntity.setAvailable(true);
+
         if (file.isPresent() && !file.get().isEmpty()) {
             try {
                 imageService.deleteImage(categoryEntity.getImage(), "image/directory/category/");

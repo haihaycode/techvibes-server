@@ -27,6 +27,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AdminCategoryController {
     @Autowired
     private CategoryService categoryService;
@@ -36,8 +37,8 @@ public class AdminCategoryController {
     public ResponseEntity<ResponseWrapper<Page<CategoryEntity>>> searchCategories(
             @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "available", required = false) Boolean available,
-            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endDate,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) Optional<String> sort) {
@@ -84,7 +85,7 @@ public class AdminCategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(value = "/category/{id}")
+    @PatchMapping(value = "/category/{id}/availability")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ResponseWrapper<CategoryEntity>> updateCategory(@PathVariable Long id) {
         ResponseWrapper<CategoryEntity> response = new ResponseWrapper<>(HttpStatus.OK, "Categories updated successfully.", categoryService.availableCategory(id));

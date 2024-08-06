@@ -28,6 +28,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AdminProductController {
     @Autowired
     private ProductService productService;
@@ -40,8 +41,8 @@ public class AdminProductController {
             @RequestParam(required = false) Long minPrice,
             @RequestParam(required = false) Long maxPrice,
             @RequestParam(required = false) Optional<String> sort,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endDate,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean available,
@@ -97,7 +98,7 @@ public class AdminProductController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping(value = "/product/{id}")
+    @PatchMapping(value = "/product/{id}/availability")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ResponseWrapper<ProductEntity>> availableProduct(@PathVariable Long id) {
         ResponseWrapper<ProductEntity> response = new ResponseWrapper<>(HttpStatus.OK, "Categories updated successfully.", productService.availableProduct(id));

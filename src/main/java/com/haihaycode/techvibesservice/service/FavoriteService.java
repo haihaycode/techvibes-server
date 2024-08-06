@@ -23,9 +23,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +35,21 @@ public class FavoriteService {
 
     public Page<FavoriteEntity> getFavoritesByCriteria(Long userId, Long productId, Date startDate, Date endDate, Pageable pageable) {
         return favoriteRepository.findFavoritesByCriteria(userId, productId, startDate, endDate, pageable);
+    }
+    public Page<Map<String, Object>> getFavoritesByCriteria(Long userId, Date startDate, Date endDate, Pageable pageable) {
+        Page<Object[]> results = favoriteRepository.findFavoritesByCriteria(userId, startDate, endDate, pageable);
+        return results.map(record -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("productId", record[0]);
+            map.put("productName", record[1]);
+            map.put("productPrice", record[2]);
+            map.put("favoriteCount", record[3]);
+            return map;
+        });
+    }
+    // Phương thức lấy danh sách người dùng đã yêu thích sản phẩm theo productId
+    public Page<UserEntity> getUsersByProductId(Long productId, Pageable pageable) {
+        return favoriteRepository.findUsersByProductId(productId, pageable);
     }
 
 
