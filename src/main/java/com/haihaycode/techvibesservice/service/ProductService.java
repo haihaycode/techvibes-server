@@ -100,7 +100,7 @@ public class ProductService {
 
 
     public ProductEntity updateProduct(Long id, ProductRequest request,Optional<MultipartFile> file){
-        var productEntity = productRepository.findById(request.getCategoryId()).orElseThrow(
+        ProductEntity productEntity = productRepository.findById(id).orElseThrow(
                 ()-> new ResourceNotFoundException("Product not found ")
         );
         CategoryEntity category = categoryRepository.findById(request.getCategoryId()).orElseThrow(

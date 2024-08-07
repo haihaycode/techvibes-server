@@ -22,7 +22,6 @@ public class FavoriteEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonManagedReference
     private UserEntity user;
 
     @ManyToOne

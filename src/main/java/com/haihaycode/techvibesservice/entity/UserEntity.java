@@ -49,10 +49,19 @@ public class UserEntity implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "user")
-    @JsonBackReference
+    @JsonManagedReference
     private List<FavoriteEntity> favorites;
 
     @OneToMany(mappedBy = "account")
-    @JsonBackReference
+    @JsonManagedReference
     private List<OrderEntity> orders;
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<AddressEntity> addresses; // Danh sách địa chỉ của người dùng
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private CartEntity cart; // Giỏ hàng của người dùng
 }
