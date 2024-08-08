@@ -14,7 +14,7 @@ import java.util.Random;
 
 @Service
 public class ImageService {
-//    private static final String IMAGE_DIR = "image/directory/products/";
+
 
     public String saveImage(MultipartFile image ,String IMAGE_DIR ) throws IOException {
         if (image == null || image.isEmpty()) {

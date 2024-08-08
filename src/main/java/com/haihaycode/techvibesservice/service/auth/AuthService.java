@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AuthService {
+
     private final JwtIssuer jwtIssuer;
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
