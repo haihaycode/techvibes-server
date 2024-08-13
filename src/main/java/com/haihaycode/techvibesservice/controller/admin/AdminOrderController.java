@@ -26,6 +26,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AdminOrderController {
     @Autowired
     private OrderService orderService;

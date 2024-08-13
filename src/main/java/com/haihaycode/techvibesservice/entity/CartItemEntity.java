@@ -1,5 +1,6 @@
     package com.haihaycode.techvibesservice.entity;
 
+    import com.fasterxml.jackson.annotation.JsonBackReference;
     import jakarta.persistence.*;
     import lombok.Getter;
     import lombok.Setter;
@@ -14,6 +15,7 @@
 
         @ManyToOne
         @JoinColumn(name = "cart_id")
+        @JsonBackReference
         private CartEntity cart; // Liên kết với giỏ hàng
 
         @ManyToOne
@@ -27,7 +29,7 @@
         @PreUpdate
         public void updatePrice() {
             if (product != null) {
-                this.price = product.getPrice();
+                this.price = product.getPrice() - (product.getPrice() * product.getDiscount() / 100);
             }
         }
     }

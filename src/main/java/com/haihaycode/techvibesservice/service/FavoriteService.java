@@ -60,20 +60,24 @@ public class FavoriteService {
         if (userOptional.isEmpty()) {
             throw new ResourceNotFoundException("User not found with ID: " + userId);
         }
-        if (productOptional.isEmpty()) {
+        if (productOptional.isEmpty() ) {
             throw new ResourceNotFoundException("Product not found with ID: " + productId);
         }
         Optional<FavoriteEntity> existingFavorite = favoriteRepository.findByUserIdAndProductId(userId, productId);
+        if(!productOptional.get().getAvailable()){
+            throw new ResourceNotFoundException("Product not found with ID: " + productId);
+        }
         if (existingFavorite.isPresent()) {
+
             favoriteRepository.delete(existingFavorite.get());
-            return "unfavorited  successfully !";
+            return "Hủy yêu thích thành công !";
         }else{
             FavoriteEntity favorite = new FavoriteEntity();
             favorite.setUser(userOptional.get());
             favorite.setProduct(productOptional.get());
             favorite.setCreateDate(new Date());
             favoriteRepository.save(favorite);
-            return "favorited  successfully !";
+            return "Yêu thích thành công !";
         }
     }
 

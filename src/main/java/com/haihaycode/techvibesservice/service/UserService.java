@@ -46,6 +46,10 @@ public class UserService {
         return Optional.ofNullable(userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email)));
     }
 
+    public List<UserEntity>  getAllUsers(){
+        return userRepository.findAll();
+    }
+
     public byte[] getImage(String filename){
         byte[] imageData = new byte[0];
         try {
@@ -55,6 +59,20 @@ public class UserService {
         }
 
         return imageData;
+    }
+
+    public void updateUserVnpTxnRef(Long userId, String vnpTxnRef) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidInputException("Không tìm thấy người dùng"));
+        user.setVnpTxnRef(vnpTxnRef);
+        userRepository.save(user);
+    }
+    public UserEntity getUserByVnpTxnRef(String vnpTxnRef) {
+        UserEntity user = userRepository.findByVnpTxnRef(vnpTxnRef)
+                .orElseThrow(() -> new InvalidInputException("Không tìm thấy người dùng"));
+        user.setVnpTxnRef("");
+        userRepository.save(user);
+        return user;
     }
 
     public Page<UserEntity> findUsersByCriteria(String keyword, Boolean available, String roleName, Pageable pageable) {

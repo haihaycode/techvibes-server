@@ -47,6 +47,9 @@ public class UserEntity implements Serializable {
 
     private String extractInfo;
 
+    @Column(name = "vnp_txn_ref", unique = true, nullable = false)
+    private String vnpTxnRef;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user")
     @JsonManagedReference

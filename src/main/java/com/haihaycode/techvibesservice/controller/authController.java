@@ -1,6 +1,7 @@
 package com.haihaycode.techvibesservice.controller;
 
 
+import com.haihaycode.techvibesservice.entity.UserEntity;
 import com.haihaycode.techvibesservice.model.auth.*;
 import com.haihaycode.techvibesservice.model.ResponseWrapper;
 import com.haihaycode.techvibesservice.security.UserPrincipal;
@@ -69,9 +70,8 @@ public class authController {
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN','STAFF')")
     @GetMapping("/auth/account")
-    public ResponseEntity<ResponseWrapper<InfoResponse>> getCurrentUser() {
-        InfoResponse infoResponse = authService.getCurrentUser();
-        ResponseWrapper<InfoResponse> response = new ResponseWrapper<>(HttpStatus.OK, "User fetched successfully", infoResponse);
+    public ResponseEntity<ResponseWrapper<UserEntity>> getCurrentUser() {
+        ResponseWrapper<UserEntity> response = new ResponseWrapper<>(HttpStatus.OK, "User fetched successfully", authService.getCurrentUser());
         return ResponseEntity.ok(response);
     }
 
@@ -106,11 +106,6 @@ public class authController {
         ResponseWrapper<Void> response = new ResponseWrapper<>(HttpStatus.OK, "Update successfully.", null);
         return ResponseEntity.ok(response);
     }
-
-
-
-
-
 
     @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @GetMapping("/auth/role")

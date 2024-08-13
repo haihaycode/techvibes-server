@@ -100,7 +100,7 @@ public class AuthService {
         userRepository.save(newUser);
     }
 
-    public InfoResponse getCurrentUser() {
+    public UserEntity getCurrentUser() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new InvalidInputException("No authentication details found.");
@@ -118,17 +118,7 @@ public class AuthService {
                 .map(role -> role.getName())
                 .collect(Collectors.toSet());
 
-        return InfoResponse.builder()
-                .userId(user.getUserId())
-                .createDate(user.getCreateDate())
-                .updateDate(user.getUpdateDate())
-                .address(user.getAddress())
-                .phone(user.getPhone())
-                .photo(user.getPhoto())
-                .fullName(user.getFullName())
-                .roles(roles)
-                .email(user.getEmail())
-                .build();
+      return  user;
     }
 
     public void changePassword(ChangePasswordRequest request) {
@@ -210,9 +200,8 @@ public class AuthService {
         UserEntity user = userRepository.findById(userPrincipal.getUserId())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         user.setFullName(request.getFullName());
-        user.setAddress(request.getAddress());
-        user.setPhone(request.getPhone());
-        user.setUpdateDate(new Date());
+
+        user.setUpdateDate(new Date()); 
 
         if (file.isPresent() && !file.get().isEmpty()) {
             try {
@@ -221,6 +210,7 @@ public class AuthService {
             } catch (IOException e) {
                 throw new InvalidInputException(e.getMessage());
             }
+            System.out.println("có");
         }
         userRepository.save(user);
     }

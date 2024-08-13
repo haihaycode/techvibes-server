@@ -23,4 +23,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
                                          @Param("roleName") String roleName,
                                          Pageable pageable);
 
+    Optional<UserEntity> findByVnpTxnRef(String vnpTxnRef);
+
 }

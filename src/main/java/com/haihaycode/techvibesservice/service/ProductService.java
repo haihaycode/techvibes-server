@@ -117,9 +117,11 @@ public class ProductService {
         productEntity.setCategory(category);
         if (file.isPresent() && !file.get().isEmpty()) {
             try {
-                imageService.deleteImage(productEntity.getImage(), "image/directory/product/");
+                if(productEntity.getImage() != null){
+                imageService.deleteImage(productEntity.getImage(), "image/directory/product/");}
                 productEntity.setImage(imageService.saveImage(file.get(), "image/directory/product/"));
             } catch (IOException e) {
+                System.out.println(e);
                 throw new InvalidInputException(e.getMessage());
             }
         }
