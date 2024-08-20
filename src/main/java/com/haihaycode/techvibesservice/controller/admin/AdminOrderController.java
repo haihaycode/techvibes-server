@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,8 +37,8 @@ public class AdminOrderController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Long minPrice,
             @RequestParam(required = false) Long maxPrice,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startUpdateDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endUpdateDate,
             @RequestParam(required = false) Long accountId,
@@ -59,6 +60,13 @@ public class AdminOrderController {
         Pageable pageable = PageRequest.of(page, limit, Sort.by(new Sort.Order(sortDirection, sortField)));
         ResponseWrapper<Page<OrderEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Orders retrieved successfully",orderService.findOrdersByCriteria(keyword, minPrice, maxPrice, startDate, endDate,
                 startUpdateDate, endUpdateDate, accountId, statusId, pageable));
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/list/orders")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public ResponseEntity<ResponseWrapper<List<OrderEntity>>> getAll() {
+        ResponseWrapper<List<OrderEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Orders retrieved successfully",orderService.getAllOrder());
         return ResponseEntity.ok(response);
     }
 

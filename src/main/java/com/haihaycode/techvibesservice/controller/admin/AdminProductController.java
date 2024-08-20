@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -32,6 +33,14 @@ import java.util.Optional;
 public class AdminProductController {
     @Autowired
     private ProductService productService;
+
+
+    @GetMapping("/list/product")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public ResponseEntity<ResponseWrapper<List<ProductEntity>>> getAllProducts(){
+        ResponseWrapper<List<ProductEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Products retrieved successfully", productService.getAll());
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/product")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")

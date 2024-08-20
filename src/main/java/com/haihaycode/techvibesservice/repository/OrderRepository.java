@@ -3,6 +3,7 @@ package com.haihaycode.techvibesservice.repository;
 import com.haihaycode.techvibesservice.entity.OrderDetailEntity;
 import com.haihaycode.techvibesservice.entity.OrderEntity;
 import com.haihaycode.techvibesservice.entity.ProductEntity;
+import com.haihaycode.techvibesservice.model.Report.ProductSalesCount;
 import com.haihaycode.techvibesservice.model.Report.ProductSalesReport;
 import com.haihaycode.techvibesservice.model.Report.RevenueReport;
 import org.springframework.data.domain.Page;
@@ -60,6 +61,21 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
                                      @Param("endDate") Date endDate,
                                      @Param("accountId") Long accountId,
                                      @Param("statusId") Long statusId);
+
+    @Query("SELECT new com.haihaycode.techvibesservice.model.Report.ProductSalesCount(p.id, p.name, SUM(od.quantity)) " +
+            "FROM OrderDetailEntity od " +
+            "JOIN od.product p " +
+            "JOIN od.order o " +
+            "WHERE (:startDate IS NULL OR o.createDate >= :startDate) " +
+            "AND (:endDate IS NULL OR o.createDate <= :endDate) " +
+            "AND (:accountId IS NULL OR o.account.userId = :accountId) " +
+            "AND (:statusId IS NULL OR o.orderStatus.id = :statusId) " +
+            "GROUP BY p.id, p.name")
+    List<ProductSalesCount> getProductSalesCount(
+            @Param("startDate") Date startDate,
+            @Param("endDate") Date endDate,
+            @Param("accountId") Long accountId,
+            @Param("statusId") Long statusId);
 
 
     @Query("SELECT od.product " +

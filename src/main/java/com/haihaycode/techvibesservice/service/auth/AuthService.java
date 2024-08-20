@@ -10,6 +10,7 @@ import com.haihaycode.techvibesservice.repository.RoleRepository;
 import com.haihaycode.techvibesservice.repository.UserRepository;
 import com.haihaycode.techvibesservice.security.JwtIssuer;
 import com.haihaycode.techvibesservice.security.UserPrincipal;
+import com.haihaycode.techvibesservice.service.CartService;
 import com.haihaycode.techvibesservice.service.UserService;
 import com.haihaycode.techvibesservice.service.image.ImageService;
 import com.haihaycode.techvibesservice.service.mail.EmailService;
@@ -49,6 +50,7 @@ public class AuthService {
     private final OtpService otpService;
     private final EmailService emailService;
     private final ImageService imageService;
+    private final CartService cartService;
 
 
     public LoginResponse attemptLogin(String email, String password) {
@@ -72,6 +74,7 @@ public class AuthService {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
+            //tạo token
             String token = jwtIssuer.issuer(principal.getUserId(), principal.getEmail(), roles);
             return LoginResponse.builder()
                     .accessToken(token)
@@ -97,7 +100,8 @@ public class AuthService {
         newUser.setCreateDate(new Date());
 
 
-        userRepository.save(newUser);
+        UserEntity user=userRepository.save(newUser);
+        cartService.cartAddUser(user.getUserId());
     }
 
     public UserEntity getCurrentUser() {

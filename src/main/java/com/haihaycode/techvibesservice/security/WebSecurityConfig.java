@@ -23,20 +23,18 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))//không tạo phiên  session , lưu tữ các trạng thái của người dùng
+                //Thay vào đó, mọi yêu cầu (request) đến ứng dụng đều phải kèm theo thông tin xác thực (thường là JWT token).
+                //Đây là cách thường được sử dụng cho các ứng dụng RESTful API, nơi mà trạng thái không được lưu trên server.
                 .formLogin(formLogin -> formLogin.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/admin/**").permitAll()
-
                         .anyRequest().authenticated()
                 );
 

@@ -68,6 +68,9 @@ public class ProductService {
         return productRepository.findProductById(productId,null,null)//sữa lại nếu đó là nguoi dùng
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
     }
+    public List<ProductEntity> getAll(){
+        return productRepository.findAll();
+    }
 
     public ProductEntity getProductForClientById(Long productId) {
         return productRepository.findProductById(productId,true,true)

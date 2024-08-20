@@ -3,6 +3,7 @@ package com.haihaycode.techvibesservice.controller.admin;
 import com.haihaycode.techvibesservice.entity.OrderDetailEntity;
 import com.haihaycode.techvibesservice.entity.OrderEntity;
 import com.haihaycode.techvibesservice.entity.ProductEntity;
+import com.haihaycode.techvibesservice.model.Report.ProductSalesCount;
 import com.haihaycode.techvibesservice.model.ResponseWrapper;
 import com.haihaycode.techvibesservice.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,16 +15,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin/reports")
+@CrossOrigin("*")
 public class AdminReportController {
     @Autowired
     private ReportService reportService;
@@ -31,12 +31,22 @@ public class AdminReportController {
     @GetMapping("/total-revenue")//tính doanh thu theo thoi gian
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseWrapper<Long>> getTotalRevenue(
-            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endDate,
             @RequestParam(value = "accountId", required = false) Long accountId,
             @RequestParam(value = "statusId", required = false) Long statusId) {
         return ResponseEntity.ok(new ResponseWrapper<>(HttpStatus.OK,"Total Revenue",reportService.getTotalRevenueBetweenDates(startDate, endDate, accountId, statusId)));
     }
+
+    @GetMapping("/product-sales")
+    public List<ProductSalesCount> getProductSalesCount(
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date endDate,
+            @RequestParam(value = "accountId", required = false) Long accountId,
+            @RequestParam(value = "statusId", required = false) Long statusId) {
+        return reportService.getProductSalesCount(startDate, endDate, accountId, statusId);
+    }
+
     @GetMapping("/sales-report")
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     public ResponseEntity<ResponseWrapper<Page<ProductEntity>>> getSalesReport(

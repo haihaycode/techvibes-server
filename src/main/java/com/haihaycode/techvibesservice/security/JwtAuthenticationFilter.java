@@ -25,10 +25,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             extractTokenFromRequest(request)
-                    .map(jwtDecoder::decode)
-                    .map(jwtToPrincipalConverter::convert)
-                    .map(UserPrincipalAuthenticationToken::new)
-                    .ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));
+                    .map(jwtDecoder::decode)// một đối tượng đại diện cho dữ liệu bên trong JWT
+                    .map(jwtToPrincipalConverter::convert)//một đối tượng chứa thông tin người dùng sau khi đã xác thực JWT.
+                    .map(UserPrincipalAuthenticationToken::new)// sẽ tạo ra một UserPrincipalAuthenticationToken từ UserPrincipal
+                    .ifPresent(authentication -> SecurityContextHolder.getContext().setAuthentication(authentication));//đại diện cho 1 đối tượng đã xt
         } catch (InvalidTokenException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

@@ -34,8 +34,8 @@ public class AdminAccountController {
 
     @Autowired
     private UserService userService;
-           @GetMapping("/users/list/k")
-           @PreAuthorize("hasRole('ADMIN,STAFF')")
+           @GetMapping("/list/users")
+           @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
            public ResponseEntity<ResponseWrapper<List<UserEntity>>> getAllUserList(){
                ResponseWrapper<List<UserEntity>> response = new ResponseWrapper<>(HttpStatus.OK, "Users fetched successfully", userService.getAllUsers());
                return ResponseEntity.ok(response);

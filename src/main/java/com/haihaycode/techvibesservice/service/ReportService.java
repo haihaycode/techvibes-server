@@ -3,10 +3,7 @@ package com.haihaycode.techvibesservice.service;
 import com.haihaycode.techvibesservice.entity.OrderDetailEntity;
 import com.haihaycode.techvibesservice.entity.OrderEntity;
 import com.haihaycode.techvibesservice.entity.ProductEntity;
-import com.haihaycode.techvibesservice.model.Report.CustomerReport;
-import com.haihaycode.techvibesservice.model.Report.OrderStatusReport;
-import com.haihaycode.techvibesservice.model.Report.ProductSalesReport;
-import com.haihaycode.techvibesservice.model.Report.RevenueReport;
+import com.haihaycode.techvibesservice.model.Report.*;
 import com.haihaycode.techvibesservice.repository.OrderRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +23,9 @@ public class ReportService {
 
     public Long getTotalRevenueBetweenDates(Date startDate, Date endDate, Long accountId, Long statusId) {
         return orderRepository.getTotalRevenueBetweenDates(startDate, endDate, accountId, statusId);
+    }
+    public List<ProductSalesCount> getProductSalesCount(Date startDate, Date endDate, Long accountId, Long statusId) {
+        return orderRepository.getProductSalesCount(startDate, endDate, accountId, statusId);
     }
     public Page<ProductEntity> getSalesByProductBetweenDates(Date startDate, Date endDate, Long accountId, Long statusId, Pageable pageable) {
         return orderRepository.getSalesByProductBetweenDates(startDate, endDate,accountId,statusId,pageable);

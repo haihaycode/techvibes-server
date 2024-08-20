@@ -10,6 +10,7 @@ import com.haihaycode.techvibesservice.repository.CartItemRepository;
 import com.haihaycode.techvibesservice.repository.ProductRepository;
 import com.haihaycode.techvibesservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +32,14 @@ public class CartService {
     @Autowired
     private UserRepository userRepository;
 
+
+    public void cartAddUser(Long userId){
+        CartEntity cart= new CartEntity();
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        cart.setUser(user);
+        cartRepository.save(cart);
+    }
 
     public CartEntity getCartByUser(Long userId) {
         UserEntity user = userRepository.findById(userId)
